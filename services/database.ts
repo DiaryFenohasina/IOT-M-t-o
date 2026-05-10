@@ -26,6 +26,15 @@ export const getDatabase = async () => {
       created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
     );
+
+    CREATE TABLE IF NOT EXISTS weather_cache (
+      region_key TEXT NOT NULL,
+      day_key TEXT NOT NULL,
+      encrypted_payload TEXT NOT NULL,
+      encrypted_updated_at TEXT NOT NULL,
+      cached_at TEXT NOT NULL,
+      PRIMARY KEY (region_key, day_key)
+    );
   `);
 
   return database;
