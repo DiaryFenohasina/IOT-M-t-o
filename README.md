@@ -10,6 +10,8 @@ Application mobile React Native avec Expo pour afficher des statistiques meteo p
 - react-native-chart-kit
 - react-native-picker-select
 - React Hooks
+- expo-sqlite
+- expo-crypto
 
 ## Installation
 
@@ -38,17 +40,47 @@ components/
   RegionPicker.tsx
   StatsCard.tsx
   WeatherLineChart.tsx
+contexts/
+  AuthContext.tsx
 data/
   regionMock.ts
 services/
+  authService.ts
+  database.ts
   meteoService.ts
 screens/
+  LoginScreen.tsx
   HomeScreen.tsx
 types/
+  auth.ts
   meteo.ts
 api/
   meteoApi.ts
 ```
+
+## Authentification locale
+
+L'application utilise une base SQLite embarquee `iot_meteo.db`.
+
+Tables creees automatiquement :
+
+```sql
+users (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL,
+  email TEXT NOT NULL UNIQUE,
+  password_hash TEXT NOT NULL,
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+)
+
+sessions (
+  id INTEGER PRIMARY KEY CHECK (id = 1),
+  user_id INTEGER NOT NULL,
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+)
+```
+
+Le premier ecran permet de creer un compte ou de se connecter. Le mot de passe est hache avec `expo-crypto` avant insertion dans SQLite.
 
 ## API
 

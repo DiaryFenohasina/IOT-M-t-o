@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   RefreshControl,
+  Pressable,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -12,11 +13,13 @@ import {
 import { RegionPicker } from '@/components/RegionPicker';
 import { StatsCard } from '@/components/StatsCard';
 import { WeatherLineChart } from '@/components/WeatherLineChart';
+import { useAuth } from '@/contexts/AuthContext';
 import type { RegionKey } from '@/data/regionMock';
 import { fetchRegionWeather } from '@/services/meteoService';
 import type { RegionWeatherData } from '@/types/meteo';
 
 export default function HomeScreen() {
+  const { logout, user } = useAuth();
   const [selectedRegion, setSelectedRegion] = useState<RegionKey>('tananarivo');
   const [weather, setWeather] = useState<RegionWeatherData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -59,7 +62,12 @@ export default function HomeScreen() {
           />
         }>
         <View style={styles.hero}>
-          <Text style={styles.eyebrow}>Station IoT Meteo</Text>
+          <View style={styles.heroTop}>
+            <Text style={styles.eyebrow}>Station IoT Meteo</Text>
+            <Pressable onPress={logout} style={styles.logoutButton}>
+              <Text style={styles.logoutText}>Sortir</Text>
+            </Pressable>
+          </View>
           <Text style={styles.title}>Statistiques regionales en temps reel</Text>
           <RegionPicker selectedRegion={selectedRegion} onChange={setSelectedRegion} />
         </View>
@@ -101,6 +109,12 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 20,
   },
+  heroTop: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
   eyebrow: {
     color: '#1b7f7a',
     fontSize: 13,
@@ -114,6 +128,23 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     lineHeight: 36,
     marginTop: 10,
+  },
+  userText: {
+    color: '#526b70',
+    fontSize: 14,
+    fontWeight: '700',
+    marginTop: 8,
+  },
+  logoutButton: {
+    backgroundColor: '#ffffff',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+  },
+  logoutText: {
+    color: '#1b7f7a',
+    fontSize: 13,
+    fontWeight: '900',
   },
   loadingCard: {
     alignItems: 'center',
