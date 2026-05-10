@@ -39,7 +39,8 @@ export default function HomeScreen() {
     try {
       const data = await fetchRegionWeather(region);
       setWeather(data);
-    } catch {
+    } catch (loadError) {
+      console.warn('Erreur chargement meteo:', loadError);
       setError("Impossible de charger les donnees depuis l'API.");
     } finally {
       setLoading(false);
