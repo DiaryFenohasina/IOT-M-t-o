@@ -26,6 +26,7 @@ export type RegionWeatherData = {
   points: MeteoPoint[];
   stats: WeatherStats;
   updatedAt: string;
+  isFromCache?: boolean;
 };
 
 export type ApiWeatherResponse = {

@@ -90,6 +90,13 @@ export default function HomeScreen() {
               </View>
             ) : null}
 
+            {!error && weather?.isFromCache ? (
+              <View style={styles.cacheCard}>
+                <Text style={styles.cacheTitle}>Mode hors ligne</Text>
+                <Text style={styles.cacheText}>Donnees affichees depuis le cache local.</Text>
+              </View>
+            ) : null}
+
             <WeatherLineChart points={weather?.points ?? []} />
             {weather ? <StatsCard weather={weather} /> : null}
           </>
@@ -178,6 +185,24 @@ const styles = StyleSheet.create({
   },
   errorText: {
     color: '#9a3f19',
+    lineHeight: 20,
+    marginTop: 6,
+  },
+  cacheCard: {
+    backgroundColor: '#edf8f5',
+    borderColor: '#8bd6c7',
+    borderRadius: 8,
+    borderWidth: 1,
+    marginTop: 20,
+    padding: 16,
+  },
+  cacheTitle: {
+    color: '#14665f',
+    fontSize: 16,
+    fontWeight: '900',
+  },
+  cacheText: {
+    color: '#14665f',
     lineHeight: 20,
     marginTop: 6,
   },

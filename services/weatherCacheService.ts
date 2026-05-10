@@ -117,11 +117,8 @@ export const getCachedRegionWeather = async (
   regionKey: RegionKey,
 ): Promise<RegionWeatherData | null> => {
   const db = await getDatabase();
-
-  await purgeExpiredWeatherCache();
-
   const currentDateKey = getCurrentMeteoDateKey();
-  const rows = await db.getAllAsync<WeatherCacheRow>(
+  let rows = await db.getAllAsync<WeatherCacheRow>(
     `SELECT encrypted_payload, encrypted_updated_at
      FROM weather_cache
      WHERE region_key = ? AND day_key >= ?
@@ -129,6 +126,16 @@ export const getCachedRegionWeather = async (
     regionKey,
     currentDateKey,
   );
+
+  if (rows.length === 0) {
+    rows = await db.getAllAsync<WeatherCacheRow>(
+      `SELECT encrypted_payload, encrypted_updated_at
+       FROM weather_cache
+       WHERE region_key = ?
+       ORDER BY day_key DESC`,
+      regionKey,
+    );
+  }
 
   if (rows.length === 0) {
     return null;
@@ -143,6 +150,7 @@ export const getCachedRegionWeather = async (
     points,
     stats: buildStats(points),
     updatedAt,
+    isFromCache: true,
   };
 };
 
