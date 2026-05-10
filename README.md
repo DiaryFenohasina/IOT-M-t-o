@@ -1,4 +1,115 @@
-# Welcome to your Expo app 👋
+# IOT Meteo
+
+Application mobile React Native avec Expo pour afficher des statistiques meteo par region.
+
+## Technologies
+
+- React Native avec Expo
+- TypeScript
+- Axios
+- react-native-chart-kit
+- react-native-picker-select
+- React Hooks
+
+## Installation
+
+```bash
+npm install
+npx expo install react-native-svg
+npm install axios react-native-chart-kit react-native-picker-select
+```
+
+## Lancer l'application
+
+```bash
+npm run start
+```
+
+Pour le web :
+
+```bash
+npm run web
+```
+
+## Structure
+
+```text
+components/
+  RegionPicker.tsx
+  StatsCard.tsx
+  WeatherLineChart.tsx
+data/
+  regionMock.ts
+services/
+  meteoService.ts
+screens/
+  HomeScreen.tsx
+types/
+  meteo.ts
+api/
+  meteoApi.ts
+```
+
+## API
+
+La base URL est configuree dans `services/meteoService.ts` :
+
+```ts
+baseURL: 'http://localhost:8080/api/'
+```
+
+L'application appelle l'endpoint suivant quand la region change :
+
+```text
+GET /api/meteo/:region?latitude=-18.8792&longitude=47.5079
+```
+
+Exemple :
+
+```text
+GET http://localhost:8080/api/meteo/tananarivo?latitude=-18.8792&longitude=47.5079
+```
+
+## Exemple de reponse API
+
+Format simple accepte :
+
+```json
+{
+  "region": "tananarivo",
+  "updatedAt": "2026-05-10T09:00:00.000Z",
+  "current": {
+    "temperature": 24.8,
+    "windSpeed": 12
+  },
+  "data": [
+    { "time": "2026-05-10T06:00:00.000Z", "temperature": 20.2, "humidity": 79, "windSpeed": 8 },
+    { "time": "2026-05-10T09:00:00.000Z", "temperature": 24.8, "humidity": 65, "windSpeed": 12 },
+    { "time": "2026-05-10T12:00:00.000Z", "temperature": 28.1, "humidity": 58, "windSpeed": 16 }
+  ]
+}
+```
+
+Format type Open-Meteo egalement accepte :
+
+```json
+{
+  "current": {
+    "temperature_2m": 24.8,
+    "wind_speed_10m": 12
+  },
+  "hourly": {
+    "time": ["2026-05-10T06:00", "2026-05-10T09:00", "2026-05-10T12:00"],
+    "temperature_2m": [20.2, 24.8, 28.1],
+    "relative_humidity_2m": [79, 65, 58],
+    "wind_speed_10m": [8, 12, 16]
+  }
+}
+```
+
+Sur Android physique, `localhost` pointe vers le telephone. Utilisez l'adresse IP de votre ordinateur ou `http://10.0.2.2:8080/api/` avec l'emulateur Android si necessaire.
+
+---
 
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
 
