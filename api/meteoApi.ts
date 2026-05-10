@@ -12,8 +12,7 @@ export const getMeteoApi = (latitude : number, longitude : number) => {
       hourly:
         "temperature_2m,relative_humidity_2m,wind_speed_10m",
       timezone: APP_TIME_ZONE,
-      forecast_days: 2,
+      forecast_days: 7,
     },
   });
 };
-
