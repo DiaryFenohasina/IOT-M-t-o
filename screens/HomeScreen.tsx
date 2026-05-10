@@ -9,6 +9,7 @@ import {
   Text,
   View,
 } from 'react-native';
+import { MaterialIcons } from "@expo/vector-icons";
 
 import { RegionPicker } from '@/components/RegionPicker';
 import { StatsCard } from '@/components/StatsCard';
@@ -65,7 +66,9 @@ export default function HomeScreen() {
           <View style={styles.heroTop}>
             <Text style={styles.eyebrow}>Station IoT Meteo</Text>
             <Pressable onPress={logout} style={styles.logoutButton}>
-              <Text style={styles.logoutText}>Sortir</Text>
+              <Text style={styles.logoutText}>
+                <MaterialIcons name="logout" size={24} color="black" />
+              </Text>
             </Pressable>
           </View>
           <Text style={styles.title}>Statistiques regionales en temps reel</Text>
