@@ -34,3 +34,42 @@ export const formatMeteoDateTime = (value: string) =>
     month: 'short',
     timeZone: APP_TIME_ZONE,
   }).format(new Date(withMadagascarOffset(value)));
+
+const getDateTimeParts = (date: Date) =>
+  new Intl.DateTimeFormat('fr-FR', {
+    day: '2-digit',
+    hour: '2-digit',
+    hour12: false,
+    month: '2-digit',
+    timeZone: APP_TIME_ZONE,
+    year: 'numeric',
+  }).formatToParts(date);
+
+const getPart = (parts: Intl.DateTimeFormatPart[], type: Intl.DateTimeFormatPartTypes) =>
+  parts.find((part) => part.type === type)?.value ?? '00';
+
+export const getCurrentMeteoDateKey = () => {
+  const parts = getDateTimeParts(new Date());
+
+  return `${getPart(parts, 'year')}-${getPart(parts, 'month')}-${getPart(parts, 'day')}`;
+};
+
+export const getMeteoDateKey = (value: string) => {
+  if (!hasTimeZoneOffset(value)) {
+    return value.slice(0, 10);
+  }
+
+  const parts = getDateTimeParts(new Date(value));
+
+  return `${getPart(parts, 'year')}-${getPart(parts, 'month')}-${getPart(parts, 'day')}`;
+};
+
+export const getMeteoHourNumber = (value: string) => {
+  if (!hasTimeZoneOffset(value)) {
+    return Number(value.match(/T(\d{2})/)?.[1] ?? 0);
+  }
+
+  const parts = getDateTimeParts(new Date(value));
+
+  return Number(getPart(parts, 'hour'));
+};
