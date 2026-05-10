@@ -3,7 +3,7 @@ const switchLatLong = (lat: number = 52.52, long: number = 13.41) => {
 }
 
 
-const fetchWeatherData = async (lat: number = 52.52, long: number = 13.41) => {
+export const fetchWeatherData = async (lat: number = 52.52, long: number = 13.41) => {
     try {
         const response = await fetch(switchLatLong(lat, long));
         if (!response.ok) {
@@ -17,7 +17,3 @@ const fetchWeatherData = async (lat: number = 52.52, long: number = 13.41) => {
     }
 }
 
-module.exports = {
-    fetchWeatherData,
-    switchLatLong
-}
