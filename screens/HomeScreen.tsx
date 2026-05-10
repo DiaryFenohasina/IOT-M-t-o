@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   RefreshControl,
@@ -16,7 +16,7 @@ import { StatsCard } from '@/components/StatsCard';
 import { WeatherLineChart } from '@/components/WeatherLineChart';
 import { useAuth } from '@/contexts/AuthContext';
 import type { RegionKey } from '@/data/regionMock';
-import { fetchRegionWeather } from '@/services/meteoService';
+import { fetchRegionWeather, syncAllRegionsWeatherCache } from '@/services/meteoService';
 import type { RegionWeatherData } from '@/types/meteo';
 
 export default function HomeScreen() {
@@ -26,6 +26,7 @@ export default function HomeScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const hasSyncedAllRegions = useRef(false);
 
   const loadWeather = async (region: RegionKey, refresh = false) => {
     if (refresh) {
@@ -39,6 +40,11 @@ export default function HomeScreen() {
     try {
       const data = await fetchRegionWeather(region);
       setWeather(data);
+
+      if (!data.isFromCache && !hasSyncedAllRegions.current) {
+        hasSyncedAllRegions.current = true;
+        void syncAllRegionsWeatherCache(region);
+      }
     } catch (loadError) {
       console.warn('Erreur chargement meteo:', loadError);
       setError("Impossible de charger les donnees depuis l'API.");

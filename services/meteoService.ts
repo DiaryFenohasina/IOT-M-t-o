@@ -1,4 +1,4 @@
-import { regionData, type RegionKey } from '@/data/regionMock';
+import { regionData, regions, type RegionKey } from '@/data/regionMock';
 import type { ApiWeatherResponse, MeteoPoint, RegionWeatherData } from '@/types/meteo';
 import { getMeteoApi } from '@/api/meteoApi';
 import {
@@ -40,31 +40,54 @@ const getCurrentTemperature = (payload: ApiWeatherResponse, points: MeteoPoint[]
   return Number(currentTemperature.toFixed(1));
 };
 
-export const fetchRegionWeather = async (regionKey: RegionKey): Promise<RegionWeatherData> => {
+const fetchApiRegionWeather = async (regionKey: RegionKey) => {
   const region = regionData[regionKey];
+  const response = await getMeteoApi(region.latitude, region.longitude).get<ApiWeatherResponse>(
+    '',
+  );
+  const allPoints = normalizePoints(response.data);
+  const updatedAt =
+    response.data.updatedAt ??
+    response.data.current?.time ??
+    response.data.current_weather?.time ??
+    new Date().toISOString();
 
   try {
-    const response = await getMeteoApi(region.latitude, region.longitude).get<ApiWeatherResponse>(
-      '',
-    );
-    const allPoints = normalizePoints(response.data);
-    const updatedAt =
-      response.data.updatedAt ??
-      response.data.current?.time ??
-      response.data.current_weather?.time ??
-      new Date().toISOString();
+    await saveWeatherForecastCache(regionKey, allPoints, updatedAt);
+  } catch (cacheError) {
+    console.warn('Impossible de sauvegarder le cache meteo local:', cacheError);
+  }
+
+  return {
+    allPoints,
+    currentTemperature: getCurrentTemperature(response.data, allPoints),
+    updatedAt,
+  };
+};
+
+export const syncAllRegionsWeatherCache = async (excludedRegionKey?: RegionKey) => {
+  const regionKeys = regions
+    .map((region) => region.key)
+    .filter((regionKey) => regionKey !== excludedRegionKey);
+
+  for (const regionKey of regionKeys) {
+    try {
+      await fetchApiRegionWeather(regionKey);
+    } catch (syncError) {
+      console.warn(`Impossible de synchroniser le cache meteo ${regionKey}:`, syncError);
+    }
+  }
+};
+
+export const fetchRegionWeather = async (regionKey: RegionKey): Promise<RegionWeatherData> => {
+  try {
+    const { allPoints, currentTemperature, updatedAt } = await fetchApiRegionWeather(regionKey);
     const weatherData = buildRegionWeatherData(
       regionKey,
       allPoints,
       updatedAt,
-      getCurrentTemperature(response.data, allPoints),
+      currentTemperature,
     );
-
-    try {
-      await saveWeatherForecastCache(regionKey, allPoints, updatedAt);
-    } catch (cacheError) {
-      console.warn('Impossible de sauvegarder le cache meteo local:', cacheError);
-    }
 
     return weatherData;
   } catch (apiError) {
