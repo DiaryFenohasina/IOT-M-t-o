@@ -82,6 +82,31 @@ sessions (
 
 Le premier ecran permet de creer un compte ou de se connecter. Le mot de passe est hache avec `expo-crypto` avant insertion dans SQLite.
 
+## Cache meteo hors ligne
+
+L'API Open-Meteo recupere maintenant `forecast_days: 7`.
+
+Au chargement d'une region :
+
+- si la connexion API fonctionne, les 7 jours de donnees horaires sont recuperes puis stockes en SQLite ;
+- les anciens jours deja passes sont supprimes automatiquement ;
+- si la connexion echoue, l'application relit les donnees meteo disponibles dans le cache local.
+
+Table utilisee :
+
+```sql
+weather_cache (
+  region_key TEXT NOT NULL,
+  day_key TEXT NOT NULL,
+  encrypted_payload TEXT NOT NULL,
+  encrypted_updated_at TEXT NOT NULL,
+  cached_at TEXT NOT NULL,
+  PRIMARY KEY (region_key, day_key)
+)
+```
+
+Les donnees meteo stockees (`encrypted_payload` et `encrypted_updated_at`) sont chiffrees avant insertion en base locale.
+
 ## API
 
 La base URL est configuree dans `services/meteoService.ts` :
